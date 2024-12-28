@@ -1,0 +1,15 @@
+lattice:
+  node_count: 5
+  energy_cost: 10
+
+api:
+  enable_dashboard: true
+  port: 5001
+
+llm:
+  model: "gpt-4"
+  api_key: "your-openai-api-key"
+
+visualization:
+  enable: true
+  refresh_rate: 5
