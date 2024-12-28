@@ -6,10 +6,11 @@ from src.utils.llm_client import LLMClient
 from src.utils.multi_modal_handler import MultiModalHandler
 from src.swarm.swarm_consensus import SwarmConsensus
 from src.integrations.solana_utils import SolanaUtils
+from src.integrations.solana_task_logger import SolanaTaskLogger
 
 
 class AIAgent:
-    """An intelligent AI agent with multi-modal capabilities, Solana blockchain integration, task management, and swarm decision-making."""
+    """An intelligent AI agent with multi-modal capabilities, Solana blockchain integration, task management, on-chain logging, and swarm decision-making."""
 
     def __init__(self, agent_id, role, provider, base_url):
         self.agent_id = agent_id
@@ -18,6 +19,7 @@ class AIAgent:
         self.multi_modal_handler = MultiModalHandler()  # Multi-modal capabilities
         self.consensus = SwarmConsensus(agent_id)  # Swarm decision-making
         self.solana_utils = SolanaUtils()  # Solana blockchain integration
+        self.task_logger = SolanaTaskLogger()  # Task logger for on-chain logging
         self.keypair = Keypair.generate()  # Generate a Solana wallet for the agent
         self.knowledge_base = []  # Stores learned knowledge or task history
         self.task_queue = queue.PriorityQueue()  # Priority queue for task management
@@ -65,6 +67,16 @@ class AIAgent:
         response = self.solana_utils.deploy_program(self.keypair, program_path)
         print(f"Agent {self.agent_id}: Contract deployed with signature {response}.")
         return response
+
+    # On-chain task logging
+    def log_task_on_chain(self, task_description, task_result):
+        """Log a task and its result on the Solana blockchain."""
+        print(f"Agent {self.agent_id}: Logging task on-chain.")
+        return self.task_logger.log_task(
+            sender_keypair=self.keypair,
+            task_description=task_description,
+            task_result=task_result
+        )
 
     # Swarm decision-making
     def propose_task_to_swarm(self, task_description):
