@@ -2,18 +2,21 @@ import json
 import queue
 import threading
 from src.utils.llm_client import LLMClient
+from src.utils.multi_modal_handler import MultiModalHandler
 
 
 class AIAgent:
-    """An intelligent AI agent that can perform specific tasks autonomously."""
+    """An intelligent AI agent with multi-modal capabilities and task management."""
 
     def __init__(self, agent_id, role, provider, base_url):
         self.agent_id = agent_id
         self.role = role
         self.llm_client = LLMClient(provider, base_url)
+        self.multi_modal_handler = MultiModalHandler()  # Multi-modal capabilities
         self.knowledge_base = []  # Stores learned knowledge or task history
         self.task_queue = queue.PriorityQueue()  # Priority queue for task management
 
+    # Task execution
     def execute_task(self, task_description):
         """Execute a task based on the description."""
         prompt = f"You are an AI agent specializing in {self.role}. {task_description}"
@@ -27,6 +30,29 @@ class AIAgent:
             print(f"Agent {self.agent_id}: Failed to execute task. Error: {e}")
             return None
 
+    def execute_text_task(self, task_description):
+        """Process a text-based task using multi-modal handler."""
+        result = self.multi_modal_handler.process_text(task_description)
+        print(f"Agent {self.agent_id}: Text task result - {result}")
+        return result
+
+    def execute_image_task(self, image_path, text_prompts):
+        """Process an image-based task using multi-modal handler."""
+        result = self.multi_modal_handler.process_image(image_path, text_prompts)
+        print(f"Agent {self.agent_id}: Image task result - {result}")
+        return result
+
+    def execute_audio_task(self, audio_path):
+        """Process an audio-based task using multi-modal handler."""
+        try:
+            result = self.multi_modal_handler.process_audio(audio_path)
+            print(f"Agent {self.agent_id}: Audio task result - {result}")
+            return result
+        except NotImplementedError as e:
+            print(f"Agent {self.agent_id}: {e}")
+            return None
+
+    # Interactions with other agents
     def interact_with_agent(self, other_agent, task_description):
         """Interact with another agent and collaborate on a task."""
         print(f"Agent {self.agent_id} interacting with Agent {other_agent.agent_id}")
@@ -40,6 +66,7 @@ class AIAgent:
         """Handle a message received from another agent."""
         print(f"Agent {self.agent_id} received a message from Agent {sender_id}: {message}")
 
+    # Knowledge base management
     def add_to_knowledge_base(self, task_description, result):
         """Store the task and result in the agent's knowledge base."""
         self.knowledge_base.append({"task": task_description, "result": result})
@@ -59,6 +86,7 @@ class AIAgent:
         except FileNotFoundError:
             print(f"Agent {self.agent_id}: No existing knowledge base found at {filename}. Starting fresh.")
 
+    # Task management
     def add_task(self, priority, task_description):
         """Add a task to the agent's priority queue."""
         self.task_queue.put((priority, task_description))
@@ -73,6 +101,7 @@ class AIAgent:
         else:
             print(f"Agent {self.agent_id}: No tasks in the queue.")
 
+    # Async execution
     def execute_task_async(self, task_description):
         """Execute a task asynchronously."""
         thread = threading.Thread(target=self.execute_task, args=(task_description,))
