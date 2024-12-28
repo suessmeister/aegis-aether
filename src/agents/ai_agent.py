@@ -7,10 +7,11 @@ from src.utils.multi_modal_handler import MultiModalHandler
 from src.swarm.swarm_consensus import SwarmConsensus
 from src.integrations.solana_utils import SolanaUtils
 from src.integrations.solana_task_logger import SolanaTaskLogger
+from src.utils.redis_task_queue import RedisTaskQueue
 
 
 class AIAgent:
-    """An intelligent AI agent with multi-modal capabilities, Solana blockchain integration, task management, on-chain logging, and swarm decision-making."""
+    """An intelligent AI agent with multi-modal capabilities, distributed task queue, Solana blockchain integration, on-chain logging, and swarm decision-making."""
 
     def __init__(self, agent_id, role, provider, base_url):
         self.agent_id = agent_id
@@ -19,10 +20,11 @@ class AIAgent:
         self.multi_modal_handler = MultiModalHandler()  # Multi-modal capabilities
         self.consensus = SwarmConsensus(agent_id)  # Swarm decision-making
         self.solana_utils = SolanaUtils()  # Solana blockchain integration
-        self.task_logger = SolanaTaskLogger()  # Task logger for on-chain logging
+        self.task_logger = SolanaTaskLogger()  # On-chain task logging
+        self.redis_queue = RedisTaskQueue()  # Distributed task queue
         self.keypair = Keypair.generate()  # Generate a Solana wallet for the agent
         self.knowledge_base = []  # Stores learned knowledge or task history
-        self.task_queue = queue.PriorityQueue()  # Priority queue for task management
+        self.task_queue = queue.PriorityQueue()  # Local task queue for prioritization
 
     # Multi-modal task execution
     def execute_text_task(self, task_description):
@@ -46,6 +48,23 @@ class AIAgent:
         except NotImplementedError as e:
             print(f"Agent {self.agent_id}: {e}")
             return None
+
+    # Distributed task queue
+    def push_task_to_queue(self, task_description):
+        """Push a task to the distributed task queue."""
+        task = {
+            "agent_id": self.agent_id,
+            "role": self.role,
+            "task_description": task_description
+        }
+        self.redis_queue.push_task(task)
+
+    def pull_task_from_queue(self):
+        """Pull a task from the distributed task queue."""
+        task = self.redis_queue.pop_task()
+        if task:
+            print(f"Agent {self.agent_id}: Processing task from queue - {task['task_description']}")
+            self.execute_task(task["task_description"])
 
     # Solana blockchain integration
     def check_balance(self):
@@ -91,14 +110,14 @@ class AIAgent:
         """Check if consensus has been reached on any task."""
         return self.consensus.get_consensus()
 
-    # Task management
+    # Local task management
     def add_task(self, priority, task_description):
-        """Add a task to the agent's priority queue."""
+        """Add a task to the agent's local priority queue."""
         self.task_queue.put((priority, task_description))
         print(f"Agent {self.agent_id}: Task added with priority {priority} - {task_description}")
 
     def process_next_task(self):
-        """Process the next task in the priority queue."""
+        """Process the next task in the local priority queue."""
         if not self.task_queue.empty():
             priority, task_description = self.task_queue.get()
             print(f"Agent {self.agent_id}: Processing task with priority {priority} - {task_description}")
