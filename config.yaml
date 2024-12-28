@@ -1,15 +1,94 @@
-lattice:
-  node_count: 5
-  energy_cost: 10
+# Environment settings
+# Set the environment for your application: development, staging, or production
+environment: development  # Options: development, staging, production
 
-api:
-  enable_dashboard: true
-  port: 5001
+# AI Agent configuration
+aether:
+  agent:
+    id: 1                        # Unique ID for the agent
+    role: "manager"              # Role of the agent (e.g., worker, explorer, coordinator)
+    max_tasks: 10                # Maximum tasks the agent can handle at once
 
+# LLM (Large Language Model) integration
 llm:
-  model: "gpt-4"
-  api_key: "your-openai-api-key"
+  provider: "openai"             # Supported providers: openai, anthropic, ollama
+  base_url: "https://api.openai.com"  # Base URL for the LLM API
+  model: "gpt-4"                 # Specify the LLM model to use
+  api_timeout: 10                # Timeout for API calls in seconds
+  retry_attempts: 3              # Retry attempts for failed requests
+  # IMPORTANT: Do NOT hardcode API keys here. Use environment variables like OPENAI_API_KEY.
 
-visualization:
-  enable: true
-  refresh_rate: 5
+# Swarm Intelligence configuration
+swarm:
+  redis:
+    host: "localhost"            # Redis server hostname
+    port: 6379                   # Redis server port
+    password: null               # Optional: Redis password if required
+  consensus_threshold: 3         # Minimum votes needed to reach consensus
+  max_proposals: 50              # Maximum number of active proposals allowed in the swarm
+
+# Blockchain integration
+blockchain:
+  solana:
+    enabled: true                # Enable/disable Solana integration
+    rpc_url: "https://api.mainnet-beta.solana.com"  # Solana RPC endpoint
+    wallet_path: "/path/to/solana-wallet.json"      # Path to Solana wallet file
+    transaction_timeout: 30      # Timeout for Solana transactions in seconds
+  ethereum:
+    enabled: true                # Enable/disable Ethereum integration
+    rpc_url: "https://mainnet.infura.io/v3/${ETH_RPC_KEY}"  # Ethereum RPC URL
+    gas_limit: 21000             # Default gas limit for Ethereum transactions
+    max_retries: 5               # Maximum retries for failed Ethereum transactions
+    # NOTE: Replace "${ETH_RPC_KEY}" with an environment variable for security.
+
+# IPFS (Decentralized Storage) configuration
+ipfs:
+  enabled: true                  # Enable/disable IPFS integration
+  api_url: "http://127.0.0.1:5001/api/v0"  # Base URL for IPFS API
+  default_storage_lifetime: 86400  # Default storage lifetime for files in seconds
+
+# Logging and Debugging
+logging:
+  level: "INFO"                  # Logging level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  file: "logs/aether.log"        # Path to the log file
+  rotate_logs: true              # Rotate log files to prevent large sizes
+  max_file_size: 10MB            # Maximum size of each log file
+  keep_logs: 7                   # Number of rotated log files to keep
+
+# Task Scheduling
+tasks:
+  max_priority: 10               # Maximum task priority value
+  default_priority: 5            # Default priority assigned to tasks
+  retry_on_failure: true         # Automatically retry failed tasks
+  retry_limit: 3                 # Maximum retry attempts for failed tasks
+  retry_interval: 60             # Time interval between retries (in seconds)
+
+# Security settings
+security:
+  enforce_https: true            # Enforce HTTPS for all network communications
+  allowed_origins:               # Allowed origins for CORS (web-based interactions)
+    - "https://yourapp.com"
+    - "http://localhost:3000"
+
+# Advanced Features
+features:
+  enable_reinforcement_learning: true
+  enable_multi_agent_collaboration: true
+  enable_knowledge_graph: true
+
+# Monitoring and Metrics
+monitoring:
+  enable: true                   # Enable/disable monitoring
+  metrics_interval: 30           # Interval (in seconds) for logging metrics
+  system_health_check: true      # Enable periodic health checks
+  alert_on_failure: true         # Send alerts on critical failures
+
+# Deployment and Scaling
+deployment:
+  replicas: 3                    # Number of agent replicas to run
+  load_balancer: "nginx"         # Load balancer type (e.g., nginx)
+  autoscaling:
+    enabled: true
+    min_replicas: 2
+    max_replicas: 10
+    cpu_threshold: 70            # CPU usage threshold for triggering scaling

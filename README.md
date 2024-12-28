@@ -36,7 +36,7 @@ This project isn’t just a framework; it’s a showcase of collaborative innova
 ### **1. Installation**
 Clone the repository and install dependencies:
 ```bash
-git clone https://github.com/AetherFrameworkAI/aether-framework.git
+git clone https://github.com/yourusername/aether-framework.git
 cd aether-framework
 pip install -r requirements.txt
 ```
@@ -71,6 +71,14 @@ python examples/agent_collaboration_example.py
 
 ---
 
+## **Basic Model for Complex Tasks**
+
+This framework is intended as a **basic model** to demonstrate how advanced concepts like **blockchain**, **IPFS**, **swarm intelligence**, and **reinforcement learning** can be combined into a single system. While it integrates multiple state-of-the-art technologies, it is not intended to represent a fully production-ready solution but rather serve as a **starting point for further development**. 
+
+By providing this framework, we aim to inspire and empower developers to explore these technologies in a practical way without the overwhelming complexity often associated with combining them. Use it, extend it, and adapt it to your needs.
+
+---
+
 ## **Built with AI**
 The Aether Framework represents a collaborative effort between human creativity and AI-driven agents. Every line of code has been guided and enhanced by AI, making this repository a testament to the power of human-AI synergy.
 
@@ -78,8 +86,3 @@ The Aether Framework represents a collaborative effort between human creativity 
 
 ## **License**
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-### **Short Description**
-**Aether Framework** is an open-source platform for building decentralized, modular AI agents with multi-chain blockchain, swarm intelligence, and reinforcement learning capabilities.
