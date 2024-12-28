@@ -84,5 +84,17 @@ The Aether Framework represents a collaborative effort between human creativity 
 
 ---
 
-## **License**
+## **License and Disclaimer**
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+
+
+This project is released under the MIT License. However, not all parts of the codebase are published under this license. Some components may be subject to different licensing terms, which are not publicly disclosed in this repository. For inquiries regarding specific parts of the code or additional licensing, please contact the maintainers.
+
+### Disclaimer
+The published code is intended as a basic model for demonstration purposes and is not designed for production-grade or foolproof use cases. While it integrates cutting-edge concepts like blockchain, IPFS, swarm intelligence, and reinforcement learning, this framework serves primarily as a starting point for further exploration and development.
+
+Important Notes:
+- The framework may require additional modifications and testing for real-world applications.
+- We do not guarantee the security, reliability, or performance of the published code.
+- Users are encouraged to perform their own audits and enhancements before deploying in sensitive or critical environments.
