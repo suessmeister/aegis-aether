@@ -36,7 +36,7 @@ This project isn’t just a framework; it’s a showcase of collaborative innova
 ### **1. Installation**
 Clone the repository and install dependencies:
 ```bash
-git clone https://github.com/yourusername/aether-framework.git
+git clone https://github.com/AetherFrameworkAI/aether-framework.git
 cd aether-framework
 pip install -r requirements.txt
 ```
