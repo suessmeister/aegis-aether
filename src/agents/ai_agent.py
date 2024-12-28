@@ -1,13 +1,15 @@
 import json
 import queue
 import threading
+from solana.keypair import Keypair
 from src.utils.llm_client import LLMClient
 from src.utils.multi_modal_handler import MultiModalHandler
 from src.swarm.swarm_consensus import SwarmConsensus
+from src.integrations.solana_utils import SolanaUtils
 
 
 class AIAgent:
-    """An intelligent AI agent with multi-modal capabilities, task management, and swarm decision-making."""
+    """An intelligent AI agent with multi-modal capabilities, Solana blockchain integration, task management, and swarm decision-making."""
 
     def __init__(self, agent_id, role, provider, base_url):
         self.agent_id = agent_id
@@ -15,6 +17,8 @@ class AIAgent:
         self.llm_client = LLMClient(provider, base_url)
         self.multi_modal_handler = MultiModalHandler()  # Multi-modal capabilities
         self.consensus = SwarmConsensus(agent_id)  # Swarm decision-making
+        self.solana_utils = SolanaUtils()  # Solana blockchain integration
+        self.keypair = Keypair.generate()  # Generate a Solana wallet for the agent
         self.knowledge_base = []  # Stores learned knowledge or task history
         self.task_queue = queue.PriorityQueue()  # Priority queue for task management
 
@@ -40,6 +44,27 @@ class AIAgent:
         except NotImplementedError as e:
             print(f"Agent {self.agent_id}: {e}")
             return None
+
+    # Solana blockchain integration
+    def check_balance(self):
+        """Check the agent's Solana wallet balance."""
+        balance = self.solana_utils.get_balance(self.keypair.public_key)
+        print(f"Agent {self.agent_id}: Solana wallet balance is {balance} lamports.")
+        return balance
+
+    def send_sol(self, recipient_pubkey, amount):
+        """Send SOL from the agent's wallet to another wallet."""
+        print(f"Agent {self.agent_id}: Sending {amount} lamports to {recipient_pubkey}.")
+        response = self.solana_utils.send_transaction(self.keypair, recipient_pubkey, amount)
+        print(f"Agent {self.agent_id}: Transaction successful with signature {response}.")
+        return response
+
+    def deploy_contract(self, program_path):
+        """Deploy a Solana program from the agent's wallet."""
+        print(f"Agent {self.agent_id}: Deploying smart contract from {program_path}.")
+        response = self.solana_utils.deploy_program(self.keypair, program_path)
+        print(f"Agent {self.agent_id}: Contract deployed with signature {response}.")
+        return response
 
     # Swarm decision-making
     def propose_task_to_swarm(self, task_description):
