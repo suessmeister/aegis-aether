@@ -76,44 +76,10 @@ The Aether Framework represents a collaborative effort between human creativity 
 
 ---
 
-## **Contributing**
-We welcome contributions! Please refer to the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to get started.
-
----
-
 ## **License**
-This project is licensed under the MIT License - see the [LICENSE](LICENSE.md) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
 ### **Short Description**
 **Aether Framework** is an open-source platform for building decentralized, modular AI agents with multi-chain blockchain, swarm intelligence, and reinforcement learning capabilities.
-
----
-
-### **GitBook Intro Section Update**
-
-**Title:** Introduction
-
----
-
-#### **Overview**
-The **Aether Framework** is a revolutionary platform for building decentralized and modular AI agents. Designed with a focus on scalability, interoperability, and autonomy, Aether empowers developers to create intelligent systems capable of:
-- Swarm-based collaboration.
-- Multi-modal task execution.
-- Blockchain and IPFS integration.
-- Dynamic self-optimization through reinforcement learning.
-
----
-
-#### **Why Aether?**
-Unlike traditional frameworks, Aether was created through the collaborative intelligence of human developers and AI agents. This unique synergy has enabled the rapid creation of an innovative system that demonstrates the potential of autonomous intelligence in Web3 and decentralized environments.
-
----
-
-#### **Key Features**
-- **Autonomous AI Agents**: Modular, scalable, and capable of decentralized operation.
-- **Swarm Intelligence**: Consensus-driven decision-making using Redis and Lua scripts.
-- **Blockchain Integration**: Full support for Solana and Ethereum networks.
-- **Decentralized Storage**: IPFS-powered file storage and retrieval.
-- **Reinforcement Learning**: Self-optimization for improved task efficiency.
