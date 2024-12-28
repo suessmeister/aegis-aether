@@ -8,10 +8,11 @@ from src.integrations.solana_utils import SolanaUtils
 from src.integrations.solana_task_logger import SolanaTaskLogger
 from src.utils.redis_task_queue import RedisTaskQueue
 from src.utils.knowledge_graph import KnowledgeGraph
+from src.utils.ipfs_client import IPFSClient
 
 
 class AIAgent:
-    """An intelligent AI agent with knowledge graph integration, multi-modal capabilities, distributed task queue, Solana blockchain integration, on-chain logging, and swarm decision-making."""
+    """An intelligent AI agent with IPFS integration, knowledge graph, multi-modal capabilities, distributed task queue, and blockchain features."""
 
     def __init__(self, agent_id, role, provider, base_url):
         self.agent_id = agent_id
@@ -22,7 +23,8 @@ class AIAgent:
         self.solana_utils = SolanaUtils()  # Solana blockchain integration
         self.task_logger = SolanaTaskLogger()  # On-chain task logging
         self.redis_queue = RedisTaskQueue()  # Distributed task queue
-        self.knowledge_graph = KnowledgeGraph()  # Knowledge graph instance
+        self.knowledge_graph = KnowledgeGraph()  # Knowledge graph integration
+        self.ipfs_client = IPFSClient()  # IPFS integration
         self.keypair = Keypair.generate()  # Generate a Solana wallet for the agent
         self.knowledge_base = []  # Stores learned knowledge or task history
         self.task_queue = queue.PriorityQueue()  # Local task queue for prioritization
@@ -91,20 +93,25 @@ class AIAgent:
 
     # Knowledge graph methods
     def add_knowledge(self, concept, attributes=None):
-        """Add a concept to the knowledge graph."""
         self.knowledge_graph.add_concept(concept, attributes)
 
     def add_knowledge_relationship(self, concept1, concept2, relationship_type):
-        """Add a relationship between two concepts in the graph."""
         self.knowledge_graph.add_relationship(concept1, concept2, relationship_type)
 
     def query_knowledge(self, concept):
-        """Query a concept from the knowledge graph."""
         return self.knowledge_graph.query_concept(concept)
 
     def visualize_knowledge_graph(self, output_path="knowledge_graph.png"):
-        """Visualize the knowledge graph."""
         self.knowledge_graph.visualize_graph(output_path)
+
+    # IPFS integration
+    def upload_to_ipfs(self, file_path):
+        """Upload a file to IPFS."""
+        return self.ipfs_client.upload_file(file_path)
+
+    def download_from_ipfs(self, cid, output_path):
+        """Download a file from IPFS."""
+        self.ipfs_client.retrieve_file(cid, output_path)
 
     # Swarm decision-making
     def propose_task_to_swarm(self, task_description):
