@@ -8,10 +8,11 @@ from src.utils.blockchain_manager import BlockchainManager
 from src.utils.redis_task_queue import RedisTaskQueue
 from src.utils.knowledge_graph import KnowledgeGraph
 from src.utils.ipfs_client import IPFSClient
+from src.utils.agent_collaboration import CollaborationFramework
 
 
 class AIAgent:
-    """An intelligent AI agent with multi-chain blockchain integration, IPFS, knowledge graph, and multi-modal capabilities."""
+    """An intelligent AI agent with collaboration framework, multi-chain blockchain integration, IPFS support, and multi-modal capabilities."""
 
     def __init__(self, agent_id, role, provider, base_url, ethereum_rpc_url=None):
         self.agent_id = agent_id
@@ -23,6 +24,7 @@ class AIAgent:
         self.redis_queue = RedisTaskQueue()  # Distributed task queue
         self.knowledge_graph = KnowledgeGraph()  # Knowledge graph integration
         self.ipfs_client = IPFSClient()  # IPFS integration
+        self.collaboration = CollaborationFramework()  # Collaboration framework
         self.keypair = Keypair.generate()  # Generate a Solana wallet for the agent
         self.knowledge_base = []  # Stores learned knowledge or task history
         self.task_queue = queue.PriorityQueue()  # Local task queue for prioritization
@@ -64,19 +66,15 @@ class AIAgent:
 
     # Blockchain methods (multi-chain support)
     def get_sol_balance(self):
-        """Get the balance of the agent's Solana wallet."""
         return self.blockchain_manager.solana_get_balance(self.keypair.public_key)
 
     def send_sol(self, recipient_pubkey, amount):
-        """Send SOL from the agent's wallet."""
         return self.blockchain_manager.solana_send_transaction(self.keypair, recipient_pubkey, amount)
 
     def get_eth_balance(self, address):
-        """Get the balance of an Ethereum wallet."""
         return self.blockchain_manager.ethereum_get_balance(address)
 
     def send_eth(self, sender_key, recipient_address, amount_ether):
-        """Send ETH from an Ethereum wallet."""
         return self.blockchain_manager.ethereum_send_transaction(sender_key, recipient_address, amount_ether)
 
     # On-chain task logging
@@ -103,12 +101,25 @@ class AIAgent:
 
     # IPFS integration
     def upload_to_ipfs(self, file_path):
-        """Upload a file to IPFS."""
         return self.ipfs_client.upload_file(file_path)
 
     def download_from_ipfs(self, cid, output_path):
-        """Download a file from IPFS."""
         self.ipfs_client.retrieve_file(cid, output_path)
+
+    # Collaboration methods
+    def send_message(self, recipient_id, message):
+        """Send a message to another agent."""
+        self.collaboration.send_message(self.agent_id, recipient_id, message)
+
+    def receive_messages(self):
+        """Receive messages for this agent."""
+        messages = self.collaboration.receive_message(self.agent_id)
+        for msg in messages:
+            print(f"Agent {self.agent_id} received message: {msg['message']}")
+
+    def delegate_task(self, recipient_id, task_description):
+        """Delegate a task to another agent."""
+        self.collaboration.delegate_task(self.agent_id, recipient_id, task_description)
 
     # Swarm decision-making
     def propose_task_to_swarm(self, task_description):
