@@ -4,24 +4,22 @@ from solana.keypair import Keypair
 from src.utils.llm_client import LLMClient
 from src.utils.multi_modal_handler import MultiModalHandler
 from src.swarm.swarm_consensus import SwarmConsensus
-from src.integrations.solana_utils import SolanaUtils
-from src.integrations.solana_task_logger import SolanaTaskLogger
+from src.utils.blockchain_manager import BlockchainManager
 from src.utils.redis_task_queue import RedisTaskQueue
 from src.utils.knowledge_graph import KnowledgeGraph
 from src.utils.ipfs_client import IPFSClient
 
 
 class AIAgent:
-    """An intelligent AI agent with IPFS integration, knowledge graph, multi-modal capabilities, distributed task queue, and blockchain features."""
+    """An intelligent AI agent with multi-chain blockchain integration, IPFS, knowledge graph, and multi-modal capabilities."""
 
-    def __init__(self, agent_id, role, provider, base_url):
+    def __init__(self, agent_id, role, provider, base_url, ethereum_rpc_url=None):
         self.agent_id = agent_id
         self.role = role
         self.llm_client = LLMClient(provider, base_url)
         self.multi_modal_handler = MultiModalHandler()  # Multi-modal capabilities
         self.consensus = SwarmConsensus(agent_id)  # Swarm decision-making
-        self.solana_utils = SolanaUtils()  # Solana blockchain integration
-        self.task_logger = SolanaTaskLogger()  # On-chain task logging
+        self.blockchain_manager = BlockchainManager(ethereum_rpc_url=ethereum_rpc_url)  # Multi-chain blockchain manager
         self.redis_queue = RedisTaskQueue()  # Distributed task queue
         self.knowledge_graph = KnowledgeGraph()  # Knowledge graph integration
         self.ipfs_client = IPFSClient()  # IPFS integration
@@ -64,23 +62,22 @@ class AIAgent:
             print(f"Agent {self.agent_id}: Processing task from queue - {task['task_description']}")
             self.execute_task(task["task_description"])
 
-    # Solana blockchain integration
-    def check_balance(self):
-        balance = self.solana_utils.get_balance(self.keypair.public_key)
-        print(f"Agent {self.agent_id}: Solana wallet balance is {balance} lamports.")
-        return balance
+    # Blockchain methods (multi-chain support)
+    def get_sol_balance(self):
+        """Get the balance of the agent's Solana wallet."""
+        return self.blockchain_manager.solana_get_balance(self.keypair.public_key)
 
     def send_sol(self, recipient_pubkey, amount):
-        print(f"Agent {self.agent_id}: Sending {amount} lamports to {recipient_pubkey}.")
-        response = self.solana_utils.send_transaction(self.keypair, recipient_pubkey, amount)
-        print(f"Agent {self.agent_id}: Transaction successful with signature {response}.")
-        return response
+        """Send SOL from the agent's wallet."""
+        return self.blockchain_manager.solana_send_transaction(self.keypair, recipient_pubkey, amount)
 
-    def deploy_contract(self, program_path):
-        print(f"Agent {self.agent_id}: Deploying smart contract from {program_path}.")
-        response = self.solana_utils.deploy_program(self.keypair, program_path)
-        print(f"Agent {self.agent_id}: Contract deployed with signature {response}.")
-        return response
+    def get_eth_balance(self, address):
+        """Get the balance of an Ethereum wallet."""
+        return self.blockchain_manager.ethereum_get_balance(address)
+
+    def send_eth(self, sender_key, recipient_address, amount_ether):
+        """Send ETH from an Ethereum wallet."""
+        return self.blockchain_manager.ethereum_send_transaction(sender_key, recipient_address, amount_ether)
 
     # On-chain task logging
     def log_task_on_chain(self, task_description, task_result):
