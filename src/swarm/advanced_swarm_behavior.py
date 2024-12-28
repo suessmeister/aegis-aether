@@ -1,4 +1,5 @@
 import random
+from src.integrations.ipfs_communication import IPFSCommunication
 
 class ReinforcementLearningAgent:
     """A basic RL agent for swarm nodes."""
@@ -31,6 +32,7 @@ class SwarmNode:
         self.tasks_completed = 0
         self.knowledge = {}  # Shared knowledge
         self.rl_agent = ReinforcementLearningAgent()
+        self.ipfs = IPFSCommunication()  # Add IPFS communication
 
     def interact(self, other_node):
         """Simulate interaction between nodes."""
@@ -96,6 +98,16 @@ class SwarmNode:
             self.energy = random.randint(50, 100)  # Assign new energy
             print(f"Node {self.id} has recovered and is now active with role: {self.role}.")
 
+    def send_decentralized_message(self, message):
+        """Send a message to IPFS."""
+        print(f"Node {self.id} sending message to IPFS...")
+        return self.ipfs.send_message(message)
+
+    def retrieve_decentralized_message(self, ipfs_hash):
+        """Retrieve a message from IPFS."""
+        print(f"Node {self.id} retrieving message from IPFS...")
+        return self.ipfs.retrieve_message(ipfs_hash)
+
 
 class Swarm:
     """A collection of swarm nodes with specialized roles and behaviors."""
@@ -127,66 +139,7 @@ class Swarm:
                 node1.interact(node2)
 
 
-class MultiObjectiveOptimizer:
-    """Optimize multiple objectives for the swarm."""
-    def __init__(self, objectives):
-        self.objectives = objectives  # List of objective functions
-
-    def evaluate(self, node_states):
-        """Evaluate all objectives for the current swarm state."""
-        scores = {}
-        for obj_name, obj_func in self.objectives.items():
-            scores[obj_name] = obj_func(node_states)
-        return scores
-
-
 # Example usage
 if __name__ == "__main__":
-    # Initialize swarm with 10 nodes
     swarm = Swarm(10)
-
-    # Define optimization objectives
-    def energy_efficiency(states):
-        return sum(node.energy for node in states) / len(states)
-
-    def task_completion(states):
-        return sum(node.tasks_completed for node in states)
-
-    objectives = {
-        "energy_efficiency": energy_efficiency,
-        "task_completion": task_completion,
-    }
-
-    optimizer = MultiObjectiveOptimizer(objectives)
-
-    # Simulate swarm behavior
-    swarm.simulate(3)
-
-    # Evaluate swarm performance
-    node_states = [{"energy": node.energy, "tasks_completed": node.tasks_completed} for node in swarm.nodes]
-    scores = optimizer.evaluate(node_states)
-    print("\n--- Swarm Performance ---")
-    for objective, score in scores.items():
-        print(f"{objective}: {score}")
-        from src.integrations.ipfs_communication import IPFSCommunication
-
-class SwarmNode:
-    def __init__(self, id, role="worker"):
-        self.id = id
-        self.role = role
-        self.state = random.random()
-        self.energy = random.randint(50, 100)
-        self.tasks_completed = 0
-        self.knowledge = {}
-        self.rl_agent = ReinforcementLearningAgent()
-        self.ipfs = IPFSCommunication()  # Add IPFS communication
-
-    def send_decentralized_message(self, message):
-        """Send a message to IPFS."""
-        print(f"Node {self.id} sending message to IPFS...")
-        return self.ipfs.send_message(message)
-
-    def retrieve_decentralized_message(self, ipfs_hash):
-        """Retrieve a message from IPFS."""
-        print(f"Node {self.id} retrieving message from IPFS...")
-        return self.ipfs.retrieve_message(ipfs_hash)
+    swarm.simulate(5)
