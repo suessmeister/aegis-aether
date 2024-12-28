@@ -1,5 +1,6 @@
 import json
 import queue
+import numpy as np
 from solana.keypair import Keypair
 from src.utils.llm_client import LLMClient
 from src.utils.multi_modal_handler import MultiModalHandler
@@ -9,12 +10,13 @@ from src.utils.redis_task_queue import RedisTaskQueue
 from src.utils.knowledge_graph import KnowledgeGraph
 from src.utils.ipfs_client import IPFSClient
 from src.utils.agent_collaboration import CollaborationFramework
+from src.utils.reinforcement_learning import QLearning
 
 
 class AIAgent:
-    """An intelligent AI agent with collaboration framework, multi-chain blockchain integration, IPFS support, and multi-modal capabilities."""
+    """An intelligent AI agent with reinforcement learning, collaboration framework, multi-chain blockchain integration, and multi-modal capabilities."""
 
-    def __init__(self, agent_id, role, provider, base_url, ethereum_rpc_url=None):
+    def __init__(self, agent_id, role, provider, base_url, ethereum_rpc_url=None, state_size=5, action_size=3):
         self.agent_id = agent_id
         self.role = role
         self.llm_client = LLMClient(provider, base_url)
@@ -25,6 +27,7 @@ class AIAgent:
         self.knowledge_graph = KnowledgeGraph()  # Knowledge graph integration
         self.ipfs_client = IPFSClient()  # IPFS integration
         self.collaboration = CollaborationFramework()  # Collaboration framework
+        self.rl_agent = QLearning(state_size, action_size)  # Reinforcement learning
         self.keypair = Keypair.generate()  # Generate a Solana wallet for the agent
         self.knowledge_base = []  # Stores learned knowledge or task history
         self.task_queue = queue.PriorityQueue()  # Local task queue for prioritization
@@ -120,6 +123,33 @@ class AIAgent:
     def delegate_task(self, recipient_id, task_description):
         """Delegate a task to another agent."""
         self.collaboration.delegate_task(self.agent_id, recipient_id, task_description)
+
+    # Self-Optimization (Reinforcement Learning)
+    def optimize_task_execution(self, state):
+        """Optimize task execution using reinforcement learning."""
+        action = self.rl_agent.choose_action(state)
+        reward = self.execute_action(action)
+        next_state = self.get_environment_state()
+        self.rl_agent.update_q_table(state, action, reward, next_state)
+        self.rl_agent.decay_exploration()
+
+    def execute_action(self, action):
+        """Execute an action and return a reward."""
+        if action == 0:  # Example action: Process next task
+            self.process_next_task()
+            return 1  # Reward for successfully processing a task
+        elif action == 1:  # Example action: Collaborate with another agent
+            self.delegate_task(2, "Collaborate on a task")
+            return 2  # Higher reward for collaboration
+        elif action == 2:  # Example action: Save knowledge
+            self.save_knowledge_base("knowledge.json")
+            return 1  # Reward for saving knowledge
+        return 0  # No reward for invalid actions
+
+    def get_environment_state(self):
+        """Simulate the agent's environment state."""
+        # Example: Generate a random state (to be replaced with actual environment sensing)
+        return np.random.randint(5)
 
     # Swarm decision-making
     def propose_task_to_swarm(self, task_description):
