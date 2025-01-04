@@ -12,31 +12,50 @@ from src.utils.ipfs_client import IPFSClient
 from src.utils.agent_collaboration import CollaborationFramework
 from src.utils.reinforcement_learning import QLearning
 from src.democracy.proposal_manager import ProposalManager
-
+import random
+import queue
+import numpy as np
+from src.integrations.llm_client import LLMClient
+from src.integrations.multi_modal_handler import MultiModalHandler
+from src.integrations.swarm_consensus import SwarmConsensus
+from src.integrations.blockchain_manager import BlockchainManager
+from src.integrations.redis_task_queue import RedisTaskQueue
+from src.integrations.knowledge_graph import KnowledgeGraph
+from src.integrations.ipfs_client import IPFSClient
+from src.integrations.collaboration_framework import CollaborationFramework
+from src.integrations.q_learning import QLearning
+from src.integrations.proposal_manager import ProposalManager
+from src.integrations.social_media_orchestrator import SocialMediaOrchestrator
+from nacl.signing import SigningKey
 
 class AIAgent:
-    """An intelligent AI agent with reinforcement learning, collaboration framework, multi-chain blockchain integration, multi-modal capabilities, and democratic voting."""
+    """
+    A fully modular AI agent with advanced features, including reinforcement learning,
+    swarm intelligence, multi-modal capabilities, blockchain integration, IPFS communication,
+    and social media orchestration.
+    """
 
     def __init__(self, agent_id, role, provider, base_url, ethereum_rpc_url=None, state_size=5, action_size=3):
         self.agent_id = agent_id
         self.role = role
         self.llm_client = LLMClient(provider, base_url)
-        self.multi_modal_handler = MultiModalHandler()  # Multi-modal capabilities
-        self.consensus = SwarmConsensus(agent_id)  # Swarm decision-making
-        self.blockchain_manager = BlockchainManager(ethereum_rpc_url=ethereum_rpc_url)  # Multi-chain blockchain manager
-        self.redis_queue = RedisTaskQueue()  # Distributed task queue
-        self.knowledge_graph = KnowledgeGraph()  # Knowledge graph integration
-        self.ipfs_client = IPFSClient()  # IPFS integration
-        self.collaboration = CollaborationFramework()  # Collaboration framework
-        self.rl_agent = QLearning(state_size, action_size)  # Reinforcement learning
-        self.keypair = Keypair.generate()  # Generate a Solana wallet for the agent
-        self.proposal_manager = ProposalManager()  # Democratic voting manager
-        self.knowledge_base = []  # Stores learned knowledge or task history
-        self.task_queue = queue.PriorityQueue()  # Local task queue for prioritization
+        self.multi_modal_handler = MultiModalHandler()
+        self.consensus = SwarmConsensus(agent_id)
+        self.blockchain_manager = BlockchainManager(ethereum_rpc_url=ethereum_rpc_url)
+        self.redis_queue = RedisTaskQueue()
+        self.knowledge_graph = KnowledgeGraph()
+        self.ipfs_client = IPFSClient()
+        self.collaboration = CollaborationFramework()
+        self.rl_agent = QLearning(state_size, action_size)
+        self.keypair = SigningKey.generate()  # Create agent's signing key for Solana
+        self.proposal_manager = ProposalManager()
+        self.social_media_orchestrator = SocialMediaOrchestrator(agent_id)
+        self.knowledge_base = []
+        self.task_queue = queue.PriorityQueue()
 
     # Multi-modal task execution
     def execute_text_task(self, task_description):
-        result = self.multi_modal_handler.process_text(task_description)
+        result = self.llm_client.generate_text(task_description)
         print(f"Agent {self.agent_id}: Text task result - {result}")
         return result
 
@@ -69,9 +88,17 @@ class AIAgent:
             print(f"Agent {self.agent_id}: Processing task from queue - {task['task_description']}")
             self.execute_text_task(task["task_description"])
 
-    # Blockchain methods (multi-chain support)
+    # Blockchain methods
+    def log_task_on_chain(self, task_description, task_result):
+        print(f"Agent {self.agent_id}: Logging task on-chain.")
+        return self.blockchain_manager.log_task(
+            sender_keypair=self.keypair,
+            task_description=task_description,
+            task_result=task_result
+        )
+
     def get_sol_balance(self):
-        return self.blockchain_manager.solana_get_balance(self.keypair.public_key)
+        return self.blockchain_manager.solana_get_balance(self.keypair.verify_key)
 
     def send_sol(self, recipient_pubkey, amount):
         return self.blockchain_manager.solana_send_transaction(self.keypair, recipient_pubkey, amount)
@@ -81,15 +108,6 @@ class AIAgent:
 
     def send_eth(self, sender_key, recipient_address, amount_ether):
         return self.blockchain_manager.ethereum_send_transaction(sender_key, recipient_address, amount_ether)
-
-    # On-chain task logging
-    def log_task_on_chain(self, task_description, task_result):
-        print(f"Agent {self.agent_id}: Logging task on-chain.")
-        return self.blockchain_manager.log_task(
-            sender_keypair=self.keypair,
-            task_description=task_description,
-            task_result=task_result
-        )
 
     # Knowledge graph methods
     def add_knowledge(self, concept, attributes=None):
@@ -104,31 +122,20 @@ class AIAgent:
     def visualize_knowledge_graph(self, output_path="knowledge_graph.png"):
         self.knowledge_graph.visualize_graph(output_path)
 
-    # IPFS integration
+    # IPFS communication
     def upload_to_ipfs(self, file_path):
         return self.ipfs_client.upload_file(file_path)
 
     def download_from_ipfs(self, cid, output_path):
         self.ipfs_client.retrieve_file(cid, output_path)
 
-    # Collaboration methods
-    def send_message(self, recipient_id, message):
-        """Send a message to another agent."""
-        self.collaboration.send_message(self.agent_id, recipient_id, message)
+    # Social media management
+    def manage_social_media(self, platform, content):
+        self.social_media_orchestrator.create_post(platform, content)
+        self.social_media_orchestrator.publish_post(platform)
 
-    def receive_messages(self):
-        """Receive messages for this agent."""
-        messages = self.collaboration.receive_message(self.agent_id)
-        for msg in messages:
-            print(f"Agent {self.agent_id} received message: {msg['message']}")
-
-    def delegate_task(self, recipient_id, task_description):
-        """Delegate a task to another agent."""
-        self.collaboration.delegate_task(self.agent_id, recipient_id, task_description)
-
-    # Self-Optimization (Reinforcement Learning)
+    # Reinforcement learning
     def optimize_task_execution(self, state):
-        """Optimize task execution using reinforcement learning."""
         action = self.rl_agent.choose_action(state)
         reward = self.execute_action(action)
         next_state = self.get_environment_state()
@@ -136,20 +143,18 @@ class AIAgent:
         self.rl_agent.decay_exploration()
 
     def execute_action(self, action):
-        """Execute an action and return a reward."""
-        if action == 0:  # Process next task
-            self.process_next_task()
-            return 1  # Reward for successfully processing a task
-        elif action == 1:  # Collaborate with another agent
-            self.delegate_task(2, "Collaborate on a task")
-            return 2  # Higher reward for collaboration
-        elif action == 2:  # Save knowledge
-            self.save_knowledge_base("knowledge.json")
-            return 1  # Reward for saving knowledge
-        return 0  # No reward for invalid actions
+        if action == 0:
+            self.pull_task_from_queue()
+            return 1
+        elif action == 1:
+            self.add_knowledge("New Task", {"status": "completed"})
+            return 2
+        elif action == 2:
+            self.log_task_on_chain("Test Task", "Success")
+            return 3
+        return 0
 
     def get_environment_state(self):
-        """Simulate the agent's environment state."""
         return np.random.randint(5)
 
     # Swarm decision-making
@@ -162,12 +167,16 @@ class AIAgent:
     def check_consensus(self):
         return self.consensus.get_consensus()
 
-    # Democratic decision-making
-    def create_proposal(self, proposal_id, description, expiration_time):
-        self.proposal_manager.create_proposal(proposal_id, description, expiration_time)
-        print(f"Agent {self.agent_id} created proposal {proposal_id}: {description}")
+    # Collaboration
+    def send_message(self, recipient_id, message):
+        self.collaboration.send_message(self.agent_id, recipient_id, message)
 
-    def vote_on_proposal(self, proposal_id):
-        vote = "yes" if random.random() > 0.5 else "no"
-        self.proposal_manager.vote(proposal_id, vote)
-        print(f"Agent {self.agent_id} voted '{vote}' on proposal {proposal_id}.")
+    def receive_messages(self):
+        messages = self.collaboration.receive_message(self.agent_id)
+        for msg in messages:
+            print(f"Agent {self.agent_id} received message: {msg['message']}")
+
+# Example usage
+if __name__ == "__main__":
+    agent = AIAgent(agent_id="JEDI-01", role="coordinator", provider="huggingface", base_url="http://localhost:8000")
+    agent.execute_text_task("Generate a project plan for the next phase.")
