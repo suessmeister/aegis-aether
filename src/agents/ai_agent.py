@@ -11,10 +11,11 @@ from src.utils.knowledge_graph import KnowledgeGraph
 from src.utils.ipfs_client import IPFSClient
 from src.utils.agent_collaboration import CollaborationFramework
 from src.utils.reinforcement_learning import QLearning
+from src.democracy.proposal_manager import ProposalManager
 
 
 class AIAgent:
-    """An intelligent AI agent with reinforcement learning, collaboration framework, multi-chain blockchain integration, and multi-modal capabilities."""
+    """An intelligent AI agent with reinforcement learning, collaboration framework, multi-chain blockchain integration, multi-modal capabilities, and democratic voting."""
 
     def __init__(self, agent_id, role, provider, base_url, ethereum_rpc_url=None, state_size=5, action_size=3):
         self.agent_id = agent_id
@@ -29,6 +30,7 @@ class AIAgent:
         self.collaboration = CollaborationFramework()  # Collaboration framework
         self.rl_agent = QLearning(state_size, action_size)  # Reinforcement learning
         self.keypair = Keypair.generate()  # Generate a Solana wallet for the agent
+        self.proposal_manager = ProposalManager()  # Democratic voting manager
         self.knowledge_base = []  # Stores learned knowledge or task history
         self.task_queue = queue.PriorityQueue()  # Local task queue for prioritization
 
@@ -65,7 +67,7 @@ class AIAgent:
         task = self.redis_queue.pop_task()
         if task:
             print(f"Agent {self.agent_id}: Processing task from queue - {task['task_description']}")
-            self.execute_task(task["task_description"])
+            self.execute_text_task(task["task_description"])
 
     # Blockchain methods (multi-chain support)
     def get_sol_balance(self):
@@ -83,7 +85,7 @@ class AIAgent:
     # On-chain task logging
     def log_task_on_chain(self, task_description, task_result):
         print(f"Agent {self.agent_id}: Logging task on-chain.")
-        return self.task_logger.log_task(
+        return self.blockchain_manager.log_task(
             sender_keypair=self.keypair,
             task_description=task_description,
             task_result=task_result
@@ -135,20 +137,19 @@ class AIAgent:
 
     def execute_action(self, action):
         """Execute an action and return a reward."""
-        if action == 0:  # Example action: Process next task
+        if action == 0:  # Process next task
             self.process_next_task()
             return 1  # Reward for successfully processing a task
-        elif action == 1:  # Example action: Collaborate with another agent
+        elif action == 1:  # Collaborate with another agent
             self.delegate_task(2, "Collaborate on a task")
             return 2  # Higher reward for collaboration
-        elif action == 2:  # Example action: Save knowledge
+        elif action == 2:  # Save knowledge
             self.save_knowledge_base("knowledge.json")
             return 1  # Reward for saving knowledge
         return 0  # No reward for invalid actions
 
     def get_environment_state(self):
         """Simulate the agent's environment state."""
-        # Example: Generate a random state (to be replaced with actual environment sensing)
         return np.random.randint(5)
 
     # Swarm decision-making
@@ -161,32 +162,12 @@ class AIAgent:
     def check_consensus(self):
         return self.consensus.get_consensus()
 
-    # Local task management
-    def add_task(self, priority, task_description):
-        self.task_queue.put((priority, task_description))
-        print(f"Agent {self.agent_id}: Task added with priority {priority} - {task_description}")
+    # Democratic decision-making
+    def create_proposal(self, proposal_id, description, expiration_time):
+        self.proposal_manager.create_proposal(proposal_id, description, expiration_time)
+        print(f"Agent {self.agent_id} created proposal {proposal_id}: {description}")
 
-    def process_next_task(self):
-        if not self.task_queue.empty():
-            priority, task_description = self.task_queue.get()
-            print(f"Agent {self.agent_id}: Processing task with priority {priority} - {task_description}")
-            self.execute_task(task_description)
-        else:
-            print(f"Agent {self.agent_id}: No tasks in the queue.")
-
-    # Knowledge base management
-    def add_to_knowledge_base(self, task_description, result):
-        self.knowledge_base.append({"task": task_description, "result": result})
-
-    def save_knowledge_base(self, filename):
-        with open(filename, 'w') as f:
-            json.dump(self.knowledge_base, f)
-        print(f"Agent {self.agent_id}: Knowledge base saved to {filename}.")
-
-    def load_knowledge_base(self, filename):
-        try:
-            with open(filename, 'r') as f:
-                self.knowledge_base = json.load(f)
-            print(f"Agent {self.agent_id}: Knowledge base loaded from {filename}.")
-        except FileNotFoundError:
-            print(f"Agent {self.agent_id}: No existing knowledge base found at {filename}. Starting fresh.")
+    def vote_on_proposal(self, proposal_id):
+        vote = "yes" if random.random() > 0.5 else "no"
+        self.proposal_manager.vote(proposal_id, vote)
+        print(f"Agent {self.agent_id} voted '{vote}' on proposal {proposal_id}.")
