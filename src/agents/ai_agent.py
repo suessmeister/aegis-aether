@@ -15,17 +15,17 @@ from src.democracy.proposal_manager import ProposalManager
 import random
 import queue
 import numpy as np
-from src.integrations.llm_client import LLMClient
-from src.integrations.multi_modal_handler import MultiModalHandler
-from src.integrations.swarm_consensus import SwarmConsensus
-from src.integrations.blockchain_manager import BlockchainManager
-from src.integrations.redis_task_queue import RedisTaskQueue
-from src.integrations.knowledge_graph import KnowledgeGraph
-from src.integrations.ipfs_client import IPFSClient
-from src.integrations.collaboration_framework import CollaborationFramework
-from src.integrations.q_learning import QLearning
-from src.integrations.proposal_manager import ProposalManager
-from src.integrations.social_media_orchestrator import SocialMediaOrchestrator
+from src.utils.llm_client import LLMClient
+from src.utils.multi_modal_handler import MultiModalHandler
+from src.swarm.swarm_consensus import SwarmConsensus
+from src.utils.blockchain_manager import BlockchainManager
+from src.utils.redis_task_queue import RedisTaskQueue
+from src.utils.knowledge_graph import KnowledgeGraph
+from src.utils.ipfs_client import IPFSClient
+from src.utils.agent_collaboration import CollaborationFramework
+from src.utils.reinforcement_learning import QLearning
+from src.democracy.proposal_manager import ProposalManager
+from src.modules.social_media_orchestrator import SocialMediaOrchestrator
 from nacl.signing import SigningKey
 
 class AIAgent:
