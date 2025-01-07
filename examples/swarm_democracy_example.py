@@ -1,4 +1,4 @@
-from src.ai.ai_agent import AIAgent
+from src.agents.ai_agent import AIAgent
 from src.swarm.swarm_voting import SwarmVoting
 
 # Create agents

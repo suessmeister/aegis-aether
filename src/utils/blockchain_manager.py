@@ -1,8 +1,8 @@
 from solana.rpc.api import Client as SolanaClient
-from solana.transaction import Transaction
-from solana.keypair import Keypair
-from solana.publickey import PublicKey
-from solana.system_program import transfer, TransferParams
+from solders.transaction import Transaction
+from solders.keypair import Keypair
+from solders.pubkey import Pubkey as PublicKey
+from solders.system_program import transfer, TransferParams
 from web3 import Web3
 
 

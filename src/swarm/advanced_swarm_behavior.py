@@ -113,7 +113,7 @@ class Swarm:
     """A collection of swarm nodes with specialized roles and behaviors."""
     def __init__(self, node_count):
         self.nodes = [
-            SwarmNode(i, role=random.choice(["worker", "explorer", "coordinator"]))
+            SwarmNode(i, role=random.choice(["worker", "researcher", "coordinator", "analyst"]))
             for i in range(node_count)
         ]
 
@@ -137,6 +137,23 @@ class Swarm:
             if len(active_nodes) > 1:
                 node1, node2 = random.sample(active_nodes, 2)
                 node1.interact(node2)
+
+    # Added method to breed a new agent based on a parent node
+    def breed_agent(self, parent_node, role):
+        """Breed a new agent based on a parent node."""
+        if role == "inherit": #simply inherit type from the parent node
+            new_node = SwarmNode(len(self.nodes), role=parent_node.role)
+        else: #otherwise, breed a specific type. 
+            new_node = SwarmNode(len(self.nodes), role=role)
+            
+        self.nodes.append(new_node)
+        return new_node
+    
+    # Added method to list all agents in the swarm
+    def list_agents(self):
+        """List all agents in the swarm."""
+        for node in self.nodes:
+            print(f"Agent {node.id}: Role={node.role}, Energy={node.energy}, Tasks={node.tasks_completed}")
 
 
 # Example usage

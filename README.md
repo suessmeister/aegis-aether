@@ -55,7 +55,7 @@ python examples/basic_agent_example.py
 
 # Reinforcement Learning Optimization
 python examples/agent_self_optimization.py
-
+    
 # Collaboration Framework Example
 python examples/agent_collaboration_example.py
 ```

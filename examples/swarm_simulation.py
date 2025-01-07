@@ -9,7 +9,7 @@ swarm.simulate(5)
 
 # Add a new agent through breeding
 parent_agent = swarm.nodes[0]
-new_agent = swarm.breed_agent(parent_agent, role="researcher")
+new_agent = swarm.breed_agent(parent_agent, role="inherit")
 
 if new_agent:
     print(f"New agent created: ID {new_agent.id}, Role {new_agent.role}")
